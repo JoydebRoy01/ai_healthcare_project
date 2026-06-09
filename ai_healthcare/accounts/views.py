@@ -37,3 +37,6 @@ def logout_view(request):
 
 def profile_view(request):
     return render(request, "accounts/profile.html")
+
+def settings_view(request):
+    return render(request, "accounts/settings.html")

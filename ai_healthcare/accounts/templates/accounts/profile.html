@@ -197,6 +197,7 @@
         font-size: 15px;
         transition: all 0.3s;
         background: var(--bg-light);
+        width: 100%;
     }
 
     .form-control:focus {
@@ -208,6 +209,15 @@
 
     .form-control:hover {
         border-color: #cbd5e1;
+    }
+
+    select.form-control {
+        cursor: pointer;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
     }
 
     .save-btn {
@@ -227,6 +237,7 @@
         margin-top: 30px;
         position: relative;
         overflow: hidden;
+        cursor: pointer;
     }
 
     .save-btn::before {
@@ -334,6 +345,7 @@
         transition: all 0.3s;
         cursor: pointer;
         font-size: 14px;
+        white-space: nowrap;
     }
 
     .tab-btn.active {
@@ -345,6 +357,26 @@
     .tab-btn:hover:not(.active) {
         color: var(--primary);
         background: rgba(255,255,255,0.5);
+    }
+
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     @keyframes fadeInUp {
@@ -362,14 +394,6 @@
         animation: fadeInUp 0.6s ease-out;
     }
 
-    .animate-card:nth-child(2) {
-        animation-delay: 0.1s;
-    }
-
-    .animate-card:nth-child(3) {
-        animation-delay: 0.2s;
-    }
-
     .security-indicator {
         display: flex;
         align-items: center;
@@ -382,6 +406,42 @@
         font-weight: 600;
         margin-top: 15px;
         border: 1px solid #fbbf24;
+    }
+
+    .medical-history-item {
+        background: var(--bg-light);
+        border-radius: var(--radius-sm);
+        padding: 15px;
+        margin-bottom: 12px;
+        border-left: 4px solid var(--primary);
+        transition: all 0.3s;
+    }
+
+    .medical-history-item:hover {
+        background: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .password-strength {
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        margin-top: 10px;
+        overflow: hidden;
+    }
+
+    .password-strength-bar {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s, background 0.3s;
+    }
+
+    .two-factor-card {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border: 1px solid #86efac;
+        border-radius: var(--radius-sm);
+        padding: 20px;
+        margin-top: 20px;
     }
 </style>
 {% endblock css %}
@@ -477,94 +537,222 @@
         <div class="profile-card animate-card">
             <!-- Tabs -->
             <div class="section-tabs">
-                <button class="tab-btn active">
+                <button class="tab-btn active" data-tab="personal">
                     <i class="fas fa-user-edit me-2"></i>Personal Info
                 </button>
-                <button class="tab-btn">
+                <button class="tab-btn" data-tab="medical">
                     <i class="fas fa-heartbeat me-2"></i>Medical Details
                 </button>
-                <button class="tab-btn">
+                <button class="tab-btn" data-tab="security">
                     <i class="fas fa-lock me-2"></i>Security
                 </button>
             </div>
 
-            <h5 class="mb-4">
-                <i class="fas fa-id-card text-primary me-2"></i>
-                Personal Information
-            </h5>
-            
-            <form id="profileForm">
-                <div class="row">
-                    <div class="col-md-6 form-group">
-                        <label class="form-label">
-                            <i class="fas fa-user"></i> First Name
-                        </label>
-                        <input type="text" class="form-control" value="{{ request.user.first_name }}" placeholder="Enter first name">
+            <!-- Personal Info Tab Content -->
+            <div class="tab-content active" id="personal-tab">
+                <h5 class="mb-4">
+                    <i class="fas fa-id-card text-primary me-2"></i>
+                    Personal Information
+                </h5>
+                
+                <form id="personalForm">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i> First Name
+                            </label>
+                            <input type="text" class="form-control" value="{{ request.user.first_name }}" placeholder="Enter first name">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i> Last Name
+                            </label>
+                            <input type="text" class="form-control" value="{{ request.user.last_name }}" placeholder="Enter last name">
+                        </div>
                     </div>
-                    <div class="col-md-6 form-group">
-                        <label class="form-label">
-                            <i class="fas fa-user"></i> Last Name
-                        </label>
-                        <input type="text" class="form-control" value="{{ request.user.last_name }}" placeholder="Enter last name">
-                    </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6 form-group">
-                        <label class="form-label">
-                            <i class="fas fa-calendar-alt"></i> Date of Birth
-                        </label>
-                        <input type="date" class="form-control" value="1995-05-15">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-alt"></i> Date of Birth
+                            </label>
+                            <input type="date" class="form-control" value="1995-05-15">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">
+                                <i class="fas fa-venus-mars"></i> Gender
+                            </label>
+                            <select class="form-control">
+                                <option value="" disabled>Select gender</option>
+                                <option selected>Male</option>
+                                <option>Female</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="col-md-6 form-group">
-                        <label class="form-label">
-                            <i class="fas fa-tint"></i> Blood Group
-                        </label>
-                        <select class="form-control">
-                            <option value="" disabled>Select blood group</option>
-                            <option selected>A+</option>
-                            <option>A-</option>
-                            <option>B+</option>
-                            <option>B-</option>
-                            <option>O+</option>
-                            <option>O-</option>
-                            <option>AB+</option>
-                            <option>AB-</option>
-                        </select>
-                    </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6 form-group">
+                    <div class="form-group">
                         <label class="form-label">
-                            <i class="fas fa-venus-mars"></i> Gender
+                            <i class="fas fa-address-card"></i> Address
                         </label>
-                        <select class="form-control">
-                            <option value="" disabled>Select gender</option>
-                            <option selected>Male</option>
-                            <option>Female</option>
-                            <option>Other</option>
-                        </select>
+                        <textarea class="form-control" rows="3" placeholder="Enter your address">123 Healthcare Street, Mumbai, Maharashtra</textarea>
                     </div>
-                    <div class="col-md-6 form-group">
+
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-save"></i> Save Personal Info
+                    </button>
+                </form>
+            </div>
+
+            <!-- Medical Details Tab Content -->
+            <div class="tab-content" id="medical-tab">
+                <h5 class="mb-4">
+                    <i class="fas fa-notes-medical text-primary me-2"></i>
+                    Medical Details
+                </h5>
+                
+                <form id="medicalForm">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tint"></i> Blood Group
+                            </label>
+                            <select class="form-control">
+                                <option value="" disabled>Select blood group</option>
+                                <option selected>A+</option>
+                                <option>A-</option>
+                                <option>B+</option>
+                                <option>B-</option>
+                                <option>O+</option>
+                                <option>O-</option>
+                                <option>AB+</option>
+                                <option>AB-</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">
+                                <i class="fas fa-weight"></i> Height (cm)
+                            </label>
+                            <input type="number" class="form-control" value="175" placeholder="Enter height">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">
+                                <i class="fas fa-weight-scale"></i> Weight (kg)
+                            </label>
+                            <input type="number" class="form-control" value="70" placeholder="Enter weight">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">
+                                <i class="fas fa-allergies"></i> Allergies
+                            </label>
+                            <input type="text" class="form-control" value="Penicillin, Dust" placeholder="Enter allergies">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">
-                            <i class="fas fa-weight"></i> Height (cm)
+                            <i class="fas fa-prescription"></i> Current Medications
                         </label>
-                        <input type="number" class="form-control" value="175" placeholder="Enter height">
+                        <textarea class="form-control" rows="3" placeholder="List your current medications">Metformin 500mg - Daily
+Levothyroxine 50mcg - Daily</textarea>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-address-card"></i> Address
-                    </label>
-                    <textarea class="form-control" rows="3" placeholder="Enter your address">123 Healthcare Street, Mumbai, Maharashtra</textarea>
-                </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-history"></i> Medical History
+                        </label>
+                        <div class="medical-history-item">
+                            <strong>Diabetes Type 2</strong> - Diagnosed 2018
+                        </div>
+                        <div class="medical-history-item">
+                            <strong>Hypothyroidism</strong> - Diagnosed 2019
+                        </div>
+                    </div>
 
-                <button type="submit" class="save-btn">
-                    <i class="fas fa-save"></i> Save Changes
-                </button>
-            </form>
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-save"></i> Save Medical Details
+                    </button>
+                </form>
+            </div>
+
+            <!-- Security Tab Content -->
+            <div class="tab-content" id="security-tab">
+                <h5 class="mb-4">
+                    <i class="fas fa-shield-alt text-primary me-2"></i>
+                    Security Settings
+                </h5>
+                
+                <form id="securityForm">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-lock"></i> Current Password
+                        </label>
+                        <input type="password" class="form-control" placeholder="Enter current password">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-key"></i> New Password
+                        </label>
+                        <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+                        <div class="password-strength">
+                            <div class="password-strength-bar" id="passwordStrength" style="width: 0%;"></div>
+                        </div>
+                        <small class="text-muted mt-2 d-block">Password strength: <span id="strengthText">Not set</span></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-check-circle"></i> Confirm New Password
+                        </label>
+                        <input type="password" class="form-control" placeholder="Confirm new password">
+                    </div>
+
+                    <div class="two-factor-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong><i class="fas fa-mobile-alt me-2"></i>Two-Factor Authentication</strong>
+                                <p class="mb-0 text-muted mt-1">Add an extra layer of security to your account</p>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary" style="border-radius: 10px;">
+                                Enable
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <label class="form-label">
+                            <i class="fas fa-session"></i> Active Sessions
+                        </label>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-desktop"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Current Session</div>
+                                <div class="info-value">Chrome - Windows • Mumbai, India</div>
+                            </div>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Last Session</div>
+                                <div class="info-value">iPhone Safari • 2 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-shield-alt"></i> Update Security Settings
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -572,12 +760,82 @@
 <!-- Tab Switching Script -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching functionality
     const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
     
     tabBtns.forEach(btn => {
         btn.addEventListener('click', function() {
+            const tabName = this.getAttribute('data-tab');
+            
+            // Remove active class from all buttons and contents
             tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked button and corresponding content
             this.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        });
+    });
+
+    // Password strength checker
+    const newPassword = document.getElementById('newPassword');
+    const strengthBar = document.getElementById('passwordStrength');
+    const strengthText = document.getElementById('strengthText');
+    
+    if (newPassword) {
+        newPassword.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            if (password.length >= 8) strength += 25;
+            if (password.match(/[a-z]+/)) strength += 25;
+            if (password.match(/[A-Z]+/)) strength += 25;
+            if (password.match(/[0-9]+/)) strength += 15;
+            if (password.match(/[$@#&!]+/)) strength += 10;
+            
+            strengthBar.style.width = strength + '%';
+            
+            if (strength <= 25) {
+                strengthBar.style.background = '#ef4444';
+                strengthText.textContent = 'Weak';
+                strengthText.style.color = '#ef4444';
+            } else if (strength <= 50) {
+                strengthBar.style.background = '#f59e0b';
+                strengthText.textContent = 'Fair';
+                strengthText.style.color = '#f59e0b';
+            } else if (strength <= 75) {
+                strengthBar.style.background = '#3b82f6';
+                strengthText.textContent = 'Good';
+                strengthText.style.color = '#3b82f6';
+            } else {
+                strengthBar.style.background = '#10b981';
+                strengthText.textContent = 'Strong';
+                strengthText.style.color = '#10b981';
+            }
+        });
+    }
+
+    // Form submission handling
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show success message
+            const saveBtn = this.querySelector('.save-btn');
+            const originalText = saveBtn.innerHTML;
+            
+            saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved Successfully!';
+            saveBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            
+            setTimeout(() => {
+                saveBtn.innerHTML = originalText;
+                saveBtn.style.background = '';
+            }, 2000);
+            
+            // Here you would typically send the form data to your backend
+            console.log('Form submitted:', this.id);
         });
     });
 });
