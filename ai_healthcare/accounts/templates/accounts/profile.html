@@ -1,0 +1,585 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Profile | AI Healthcare{% endblock %}
+
+{% block css %}
+<style>
+    :root {
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --bg-light: #f8fafc;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border: #e2e8f0;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+        --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+        --radius-sm: 10px;
+        --radius-md: 16px;
+        --radius-lg: 24px;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: var(--radius-lg);
+        padding: 40px;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+        color: white;
+    }
+
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+    }
+
+    .profile-header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 50%;
+    }
+
+    .profile-header h2 {
+        position: relative;
+        z-index: 1;
+        font-weight: 700;
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+
+    .profile-header p {
+        position: relative;
+        z-index: 1;
+        opacity: 0.9;
+        font-size: 16px;
+    }
+
+    .profile-card {
+        background: white;
+        padding: 35px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid #f1f5f9;
+        transition: transform 0.3s, box-shadow 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .profile-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), #8b5cf6);
+    }
+
+    .avatar-wrapper {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        margin: 0 auto 25px auto;
+    }
+
+    .avatar-wrapper img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 0 0 4px #e2e8f0, 0 8px 25px rgba(0,0,0,0.15);
+        transition: transform 0.3s;
+    }
+
+    .avatar-wrapper:hover img {
+        transform: scale(1.05);
+    }
+
+    .avatar-badge {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 35px;
+        height: 35px;
+        background: var(--success);
+        border-radius: 50%;
+        border: 3px solid white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 30px 0;
+    }
+
+    .stat-item {
+        background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+        padding: 20px;
+        border-radius: var(--radius-md);
+        text-align: center;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary);
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 14px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: var(--primary);
+        font-size: 16px;
+    }
+
+    .form-control {
+        border: 2px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 14px 16px;
+        font-size: 15px;
+        transition: all 0.3s;
+        background: var(--bg-light);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        background: white;
+        outline: none;
+    }
+
+    .form-control:hover {
+        border-color: #cbd5e1;
+    }
+
+    .save-btn {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        border: none;
+        padding: 14px 35px;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        justify-content: center;
+        margin-top: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .save-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .save-btn:hover::before {
+        left: 100%;
+    }
+
+    .save-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    }
+
+    .badge-medical {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        color: #166534;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #86efac;
+    }
+
+    .badge-medical i {
+        color: #16a34a;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: var(--bg-light);
+        border-radius: var(--radius-sm);
+        margin-bottom: 12px;
+        transition: all 0.3s;
+        border: 1px solid transparent;
+    }
+
+    .info-item:hover {
+        background: white;
+        border-color: var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .info-icon {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 18px;
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-label {
+        font-size: 11px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 3px;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 15px;
+    }
+
+    .section-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        background: var(--bg-light);
+        padding: 5px;
+        border-radius: var(--radius-md);
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        background: transparent;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        color: var(--text-secondary);
+        transition: all 0.3s;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .tab-btn.active {
+        background: white;
+        color: var(--primary);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .tab-btn:hover:not(.active) {
+        color: var(--primary);
+        background: rgba(255,255,255,0.5);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .animate-card:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+
+    .animate-card:nth-child(3) {
+        animation-delay: 0.2s;
+    }
+
+    .security-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 15px;
+        background: #fef3c7;
+        border-radius: var(--radius-sm);
+        color: #92400e;
+        font-size: 13px;
+        font-weight: 600;
+        margin-top: 15px;
+        border: 1px solid #fbbf24;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+<!-- Profile Header -->
+<div class="profile-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="fas fa-user-circle me-2"></i> My Profile</h2>
+            <p>Manage your personal information and health preferences</p>
+        </div>
+        <div>
+            <span class="badge-medical">
+                <i class="fas fa-crown"></i> Premium Patient
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column -->
+    <div class="col-lg-4 mb-4">
+        <div class="profile-card animate-card">
+            <div class="avatar-wrapper">
+                <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=667eea&color=fff&size=200" alt="User">
+                <div class="avatar-badge">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+            <h4 class="mb-1">{{ request.user.username }}</h4>
+            <p class="text-muted mb-3">ID: #AI-99283</p>
+            
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Reports</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">Scans</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">98%</div>
+                    <div class="stat-label">Health Score</div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Contact Information -->
+            <div class="info-item">
+                <div class="info-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="info-content">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value">{{ request.user.email }}</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="info-content">
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value">+91 99999 99999</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="info-content">
+                    <div class="info-label">Location</div>
+                    <div class="info-value">Mumbai, India</div>
+                </div>
+            </div>
+
+            <!-- Security Notice -->
+            <div class="security-indicator">
+                <i class="fas fa-shield-alt"></i>
+                Your data is encrypted and secure
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-8">
+        <div class="profile-card animate-card">
+            <!-- Tabs -->
+            <div class="section-tabs">
+                <button class="tab-btn active">
+                    <i class="fas fa-user-edit me-2"></i>Personal Info
+                </button>
+                <button class="tab-btn">
+                    <i class="fas fa-heartbeat me-2"></i>Medical Details
+                </button>
+                <button class="tab-btn">
+                    <i class="fas fa-lock me-2"></i>Security
+                </button>
+            </div>
+
+            <h5 class="mb-4">
+                <i class="fas fa-id-card text-primary me-2"></i>
+                Personal Information
+            </h5>
+            
+            <form id="profileForm">
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i> First Name
+                        </label>
+                        <input type="text" class="form-control" value="{{ request.user.first_name }}" placeholder="Enter first name">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i> Last Name
+                        </label>
+                        <input type="text" class="form-control" value="{{ request.user.last_name }}" placeholder="Enter last name">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar-alt"></i> Date of Birth
+                        </label>
+                        <input type="date" class="form-control" value="1995-05-15">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label class="form-label">
+                            <i class="fas fa-tint"></i> Blood Group
+                        </label>
+                        <select class="form-control">
+                            <option value="" disabled>Select blood group</option>
+                            <option selected>A+</option>
+                            <option>A-</option>
+                            <option>B+</option>
+                            <option>B-</option>
+                            <option>O+</option>
+                            <option>O-</option>
+                            <option>AB+</option>
+                            <option>AB-</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label class="form-label">
+                            <i class="fas fa-venus-mars"></i> Gender
+                        </label>
+                        <select class="form-control">
+                            <option value="" disabled>Select gender</option>
+                            <option selected>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label class="form-label">
+                            <i class="fas fa-weight"></i> Height (cm)
+                        </label>
+                        <input type="number" class="form-control" value="175" placeholder="Enter height">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-address-card"></i> Address
+                    </label>
+                    <textarea class="form-control" rows="3" placeholder="Enter your address">123 Healthcare Street, Mumbai, Maharashtra</textarea>
+                </div>
+
+                <button type="submit" class="save-btn">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Switching Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+});
+</script>
+{% endblock content %}

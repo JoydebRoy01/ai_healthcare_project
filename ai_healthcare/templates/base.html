@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Healthcare{% endblock %}</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6; /* Soft background for the main content */
+            color: #333;
+        }
+
+        /* App Layout Wrapper */
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            /* Push content to the right of your 240px fixed sidebar */
+            margin-left: 240px; 
+            padding: 30px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive Layout for Mobile */
+        @media (max-width: 768px) {
+            .app-wrapper {
+                flex-direction: column;
+            }
+            .main-content {
+                margin-left: 0; /* Remove margin on mobile so it stacks under the sidebar */
+                padding: 15px;
+            }
+        }
+    </style>
+
+    {% block css %}{% endblock %}
+
+</head>
+<body>
+
+    <div class="app-wrapper">
+        
+        {% include 'sidebar.html' %}
+
+        <main class="main-content">
+            {% block content %}
+            {% endblock %}
+        </main>
+
+    </div>
+
+    {% block js %}
+    {% endblock %}
+
+</body>
+</html>

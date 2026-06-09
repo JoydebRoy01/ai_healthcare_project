@@ -1,0 +1,519 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard | AI Healthcare{% endblock %}
+
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    /* Modify body background specifically for the dashboard */
+    body {
+        background: #f8fafc; 
+        color: #1e293b;
+    }
+
+    /* Subtle animated background */
+    body::before {
+        content: "";
+        position: fixed;
+        width: 800px;
+        height: 800px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.03), rgba(16, 185, 129, 0.03));
+        border-radius: 50%;
+        top: -300px;
+        right: -200px;
+        animation: float 20s infinite alternate ease-in-out;
+        z-index: -1;
+    }
+
+    @keyframes float {
+        0% { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(-30px, 60px) scale(1.05); }
+    }
+
+    /* Top Header Area */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+
+    .dashboard-header h2 {
+        font-weight: 800;
+        font-size: 28px;
+        margin-bottom: 6px;
+        color: #0f172a;
+        letter-spacing: -0.5px;
+    }
+
+    .dashboard-header p {
+        color: #64748b;
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .btn-upload {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-upload:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+        color: white;
+        background: #2563eb;
+    }
+
+    /* Premium Stat Cards */
+    .stat-card {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+        position: relative;
+        margin-bottom: 25px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+        border-color: #e2e8f0;
+    }
+
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .icon-blue { background: #eff6ff; color: #3b82f6; }
+    .icon-purple { background: #faf5ff; color: #a855f7; }
+    .icon-green { background: #f0fdf4; color: #22c55e; }
+    .icon-orange { background: #fff7ed; color: #f97316; }
+
+    .stat-card h5 { 
+        font-size: 14px; 
+        font-weight: 600; 
+        color: #64748b;
+        margin-bottom: 5px; 
+    }
+
+    .stat-card h2 { 
+        font-size: 32px; 
+        font-weight: 800; 
+        color: #0f172a;
+        margin: 0; 
+        letter-spacing: -1px;
+    }
+
+    .stat-trend {
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 15px;
+    }
+    .trend-up { color: #22c55e; }
+    .trend-neutral { color: #3b82f6; }
+
+    /* Dashboard Boxes */
+    .dashboard-box {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+        border: 1px solid #f1f5f9;
+        height: 100%;
+    }
+
+    .box-title {
+        color: #0f172a;
+        font-weight: 700;
+        margin-bottom: 20px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Recent Reports Table */
+    .table-custom th {
+        border-bottom: 1px solid #e2e8f0;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        padding: 16px;
+        letter-spacing: 0.5px;
+    }
+    
+    .table-custom td {
+        vertical-align: middle;
+        padding: 16px;
+        border-bottom: 1px solid #f8fafc;
+        color: #334155;
+        font-size: 14.5px;
+        font-weight: 500;
+    }
+
+    .table-custom tr:hover td { background-color: #f8fafc; }
+    .report-icon { font-size: 18px; margin-right: 12px; }
+    .badge { padding: 6px 12px; border-radius: 50px; font-weight: 600; font-size: 12px; }
+
+    /* Upgraded AI Chat Area */
+    .chat-container {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 20px;
+        height: 280px;
+        overflow-y: auto;
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .chat-container::-webkit-scrollbar { width: 6px; }
+    .chat-container::-webkit-scrollbar-track { background: transparent; }
+    .chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    .chat-bubble {
+        padding: 14px 18px;
+        font-size: 14px;
+        line-height: 1.5;
+        max-width: 85%;
+    }
+
+    .bubble-ai {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px 16px 16px 4px;
+        align-self: flex-start;
+        color: #1e293b;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .bubble-user {
+        background: #3b82f6;
+        color: #ffffff;
+        border-radius: 16px 16px 4px 16px;
+        align-self: flex-end;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    .ai-input-group {
+        display: flex;
+        gap: 10px;
+        background: #ffffff;
+        padding: 6px;
+        border-radius: 50px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .ai-input-group input {
+        flex: 1;
+        padding: 10px 20px;
+        border: none;
+        background: transparent;
+        font-size: 14.5px;
+    }
+    .ai-input-group input:focus { outline: none; box-shadow: none; }
+
+    .btn-send {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    .btn-send:hover { background: #2563eb; transform: scale(1.05); }
+
+    /* Responsive adjustments */
+    @media (max-width: 991px) {
+        .dashboard-box { margin-bottom: 25px; }
+    }
+    @media (max-width: 768px) {
+        .dashboard-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+    }
+</style>
+{% endblock css %}
+
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h2>Welcome back, {{ request.user.username|default:"Patient" }} 👋</h2>
+        <p>Here is your latest health analysis and AI insights.</p>
+    </div>
+    <a href="#" class="btn-upload">
+        <i class="fas fa-cloud-upload-alt"></i> Analyze New Report
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <h5>Analyzed Reports</h5>
+                    <h2>18</h2>
+                </div>
+                <div class="icon-box icon-blue">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+            </div>
+            <div class="stat-trend trend-up">
+                <i class="fas fa-arrow-up"></i> <span>2 this month</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <h5>AI Insights Found</h5>
+                    <h2>24</h2>
+                </div>
+                <div class="icon-box icon-purple">
+                    <i class="fas fa-brain"></i>
+                </div>
+            </div>
+            <div class="stat-trend trend-neutral">
+                <i class="fas fa-check-circle"></i> <span>System Active</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <h5>Overall Health</h5>
+                    <h2>89%</h2>
+                </div>
+                <div class="icon-box icon-green">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+            </div>
+            <div class="stat-trend trend-up">
+                <i class="fas fa-arrow-up"></i> <span>5% improvement</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <h5>Active Meds</h5>
+                    <h2>3</h2>
+                </div>
+                <div class="icon-box icon-orange">
+                    <i class="fas fa-pills"></i>
+                </div>
+            </div>
+            <div class="stat-trend trend-neutral">
+                <i class="fas fa-clock"></i> <span>All on schedule</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-8 col-lg-7">
+        
+        <div class="dashboard-box mb-4">
+            <h5 class="box-title"><i class="fas fa-chart-area text-primary"></i> Health Score Trend</h5>
+            <div style="position: relative; height: 260px; width: 100%;">
+                <canvas id="healthChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dashboard-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="box-title mb-0"><i class="fas fa-folder-open text-primary"></i> Recent Reports</h5>
+                <a href="#" class="text-decoration-none fw-semibold" style="font-size: 14px; color: #3b82f6;">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-custom table-borderless m-0">
+                    <thead>
+                        <tr>
+                            <th>Document</th>
+                            <th>Date Uploaded</th>
+                            <th>AI Analysis</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="fas fa-file-pdf report-icon text-danger"></i> Complete_Blood_Count.pdf</td>
+                            <td>Today, 10:30 AM</td>
+                            <td><span class="badge bg-success bg-opacity-10 text-success border border-success">Normal</span></td>
+                            <td><button class="btn btn-sm btn-light rounded-circle" type="button"><i class="fas fa-eye text-secondary"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-file-pdf report-icon text-danger"></i> Lipid_Panel_Results.pdf</td>
+                            <td>Oct 12, 2025</td>
+                            <td><span class="badge bg-warning bg-opacity-10 text-warning border border-warning">Needs Attention</span></td>
+                            <td><button class="btn btn-sm btn-light rounded-circle" type="button"><i class="fas fa-eye text-secondary"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-file-pdf report-icon text-danger"></i> MRI_Lower_Back.pdf</td>
+                            <td>Sep 28, 2025</td>
+                            <td><span class="badge bg-info bg-opacity-10 text-info border border-info">Consult Doctor</span></td>
+                            <td><button class="btn btn-sm btn-light rounded-circle" type="button"><i class="fas fa-eye text-secondary"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div> <div class="col-xl-4 col-lg-5">
+        <div class="dashboard-box mb-4">
+            <h5 class="box-title"><i class="fas fa-robot text-primary"></i> AI Health Assistant</h5>
+            <p style="color: #64748b; font-size: 13px; margin-bottom: 15px;">
+                Powered by Google Gemini. Ask about your recent reports.
+            </p>
+            
+            <div class="chat-container">
+                <div class="chat-bubble bubble-ai">
+                    <strong>Gemini AI</strong><br>
+                    Hello {{ request.user.username|default:"Patient" }}! I analyzed your recent Lipid Panel. I noticed your LDL cholesterol is slightly elevated.
+                </div>
+                <div class="chat-bubble bubble-user">
+                    Should I change my diet?
+                </div>
+                <div class="chat-bubble bubble-ai">
+                    <strong>Gemini AI</strong><br>
+                    Yes, incorporating more soluble fiber (like oats and beans) and reducing saturated fats can help. Always consult your doctor before making major changes.
+                </div>
+            </div>
+
+            <form onsubmit="event.preventDefault();">
+                <div class="ai-input-group mt-2">
+                    <input type="text" placeholder="Type your health question...">
+                    <button type="submit" class="btn-send">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="dashboard-box" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; border: none;">
+            <h5 class="box-title text-white mb-3"><i class="fas fa-lightbulb text-warning"></i> AI Daily Tip</h5>
+            <p style="font-size: 14.5px; opacity: 0.9; line-height: 1.6; margin: 0;">
+                Based on your latest reports, drinking an extra glass of water in the morning and incorporating 20 minutes of light cardio could help improve your baseline metrics.
+            </p>
+        </div>
+    </div> </div> {% endblock content %}
+
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Chart.js - Sleeker Analytics Chart
+        const ctx = document.getElementById('healthChart');
+        if (ctx) {
+            const context2d = ctx.getContext('2d');
+            
+            // Creating a smooth gradient for the chart background fill
+            let gradient = context2d.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.25)'); // Light blue
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Overall Health Score',
+                        data: [72, 75, 74, 82, 85, 89],
+                        borderColor: '#3b82f6',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4, 
+                        pointRadius: 4,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#3b82f6',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 12,
+                            titleFont: { family: 'Inter', size: 13 },
+                            bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
+                            displayColors: false,
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 50,
+                            max: 100,
+                            ticks: { 
+                                color: '#94a3b8', 
+                                font: { family: 'Inter', size: 12 } 
+                            },
+                            grid: { color: '#f1f5f9' },
+                            border: { display: false }
+                        },
+                        x: {
+                            ticks: { 
+                                color: '#94a3b8', 
+                                font: { family: 'Inter', size: 12 } 
+                            },
+                            grid: { display: false },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock js %}

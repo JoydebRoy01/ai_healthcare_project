@@ -1,38 +1,58 @@
 import os
 
-import google.genai as genai
+try:
+    import google.genai as genai
+except ImportError:
+    genai = None
 
-API_KEY = os.environ.get('GOOGLE_API_KEY')
-if not API_KEY:
-    raise RuntimeError('Missing GOOGLE_API_KEY environment variable for Google GenAI API')
+API_KEY = os.environ.get("GOOGLE_API_KEY")
 
 MODEL_NAMES = [
-    'gemini-flash-latest',
-    'gemini-3.5-flash',
-    'gemini-2.5-flash',
+    "gemini-flash-latest",
+    "gemini-3.5-flash",
+    "gemini-2.5-flash",
 ]
 
-client = genai.Client(api_key=API_KEY)
+client = None
+
+if API_KEY and genai:
+    client = genai.Client(api_key=API_KEY)
 
 
 def format_model_response(response):
-    if not getattr(response, 'candidates', None):
-        return 'AI service returned no response.'
+    if not getattr(response, "candidates", None):
+        return "AI service returned no response."
 
     parts = []
     candidate = response.candidates[0]
-    for item in getattr(candidate, 'content', []):
+
+    for item in getattr(candidate, "content", []):
         if isinstance(item, str):
             parts.append(item)
         else:
-            parts.append(getattr(item, 'text', str(item)))
+            parts.append(getattr(item, "text", str(item)))
 
-    return ''.join(parts).strip() or 'AI service returned an empty response.'
+    return "".join(parts).strip()
 
 
 def analyze_medical_report(text):
     if not text:
-        return 'No report text was extracted from the upload.'
+        return "No report text was extracted from the upload."
+
+    # Run without API key
+    if not client:
+        return f"""
+Medical Report Analysis (Demo Mode)
+
+Report Length: {len(text)} characters
+
+AI analysis is currently disabled because no GOOGLE_API_KEY is configured.
+
+To enable Gemini analysis:
+1. Create a Gemini API key.
+2. Set GOOGLE_API_KEY environment variable.
+3. Restart the Django server.
+"""
 
     prompt = f"""
     You are a medical assistant AI.
@@ -43,7 +63,6 @@ def analyze_medical_report(text):
     {text}
 
     Provide:
-
     1. Abnormal values
     2. Possible health issues
     3. Explanation in simple language
@@ -52,6 +71,7 @@ def analyze_medical_report(text):
     """
 
     last_error = None
+
     for model_name in MODEL_NAMES:
         try:
             response = client.models.generate_content(
@@ -61,6 +81,5 @@ def analyze_medical_report(text):
             return format_model_response(response)
         except Exception as exc:
             last_error = exc
-            continue
 
-    return f'AI service error: {last_error}'
+    return f"AI service error: {last_error}"

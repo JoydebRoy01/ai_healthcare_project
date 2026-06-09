@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Report History | AI Healthcare{% endblock %}
+
+{% block css %}
+<style>
+    .history-header {
+        margin-bottom: 40px;
+    }
+
+    .history-header h2 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 10px;
+    }
+
+    /* Timeline Styling */
+    .timeline {
+        position: relative;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 0;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e2e8f0;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 60px;
+        margin-bottom: 40px;
+    }
+
+    .timeline-dot {
+        position: absolute;
+        left: 11px;
+        top: 0;
+        width: 20px;
+        height: 20px;
+        background: #3b82f6;
+        border: 4px solid #ffffff;
+        border-radius: 50%;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .timeline-content {
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        border: 1px solid #f1f5f9;
+        transition: transform 0.3s ease;
+    }
+
+    .timeline-content:hover {
+        transform: translateY(-5px);
+    }
+
+    .date-badge {
+        font-size: 12px;
+        font-weight: 700;
+        color: #3b82f6;
+        background: #eff6ff;
+        padding: 4px 10px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+
+    .timeline-content h4 {
+        margin: 0 0 10px 0;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .timeline-content p {
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    .view-btn {
+        padding: 8px 16px;
+        background: #f1f5f9;
+        color: #475569;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .view-btn:hover { background: #e2e8f0; }
+
+    @media (max-width: 768px) {
+        .timeline::before { left: 0; }
+        .timeline-dot { left: -9px; }
+        .timeline-item { padding-left: 30px; }
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="history-header">
+    <h2><i class="fas fa-history text-primary"></i> Report History</h2>
+    <p>A chronological timeline of all your medical analyses.</p>
+</div>
+
+<div class="timeline">
+    <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+            <span class="date-badge">JUNE 08, 2026</span>
+            <h4>Complete Blood Count Analysis</h4>
+            <p>Your latest report shows normal levels. Keep maintaining your current diet. No action required.</p>
+            <a href="#" class="view-btn"><i class="fas fa-file-pdf"></i> View Report</a>
+        </div>
+    </div>
+
+    <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+            <span class="date-badge">JUNE 05, 2026</span>
+            <h4>X-Ray Chest Scan</h4>
+            <p>Analysis complete. Results indicate clear lung function. No anomalies detected.</p>
+            <a href="#" class="view-btn"><i class="fas fa-file-pdf"></i> View Report</a>
+        </div>
+    </div>
+
+    <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+            <span class="date-badge">MAY 20, 2026</span>
+            <h4>Lipid Panel Results</h4>
+            <p>AI detected slightly elevated cholesterol. Recommendations included in the full report summary.</p>
+            <a href="#" class="view-btn"><i class="fas fa-file-pdf"></i> View Report</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
